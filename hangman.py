@@ -16,6 +16,7 @@ def check_word(phrase, revealed):
 
 # gets the secret phrase from player
 def get_phrase(player):
+        print("\nEnter \"XXXX\" to quit game.")
         phrase = input(f"\nPlayer {player} | Enter secret word or phrase: ").upper()
         revealed = ['_'] * len(phrase)
         for index, letter in enumerate(phrase):
@@ -42,10 +43,16 @@ def show_revealed(revealed):
         print(letter, end=" ")
     print("\n")
 
+# create scoreboard
+def show_scoreboard(scoreboard):
+    print("\nScoreboard:\n")
+    print(f"Player 1: {scoreboard[1]} | Player 2: {scoreboard[2]}\n")
+
 # shows the hangman graphic and list of wrong guesses
 def show_hangman(mistakes, wrong_guesses):
     format_guesses = " ".join(wrong_guesses)
     clear_screen()
+
 
     print(f"\n   +-----+ \t Mistakes: {format_guesses}")
     match mistakes:
@@ -78,7 +85,8 @@ def show_hangman(mistakes, wrong_guesses):
             print("   |    ~|~")
             print("   |    / \\")
     print("   |       ")
-    
+
+
 def take_turn(player):
     # sets guessing player
     if player == 1:
@@ -89,10 +97,19 @@ def take_turn(player):
     # gets secret phrase from player
     phrase, revealed = get_phrase(player)
 
+    # check for quit game command
+    if phrase == "XXXX":
+        print("\nThanks for playing!\n")
+        exit()
+
     # initialize variables
     mistakes = 0
     wrong_guesses = []
     word_guessed = False
+
+    # initialize scoreboard variables
+    player1_score = 0
+    player2_score = 0
 
     # game loop
     while mistakes < 6:
@@ -113,12 +130,34 @@ def take_turn(player):
             show_hangman(mistakes, wrong_guesses)
             show_revealed(revealed)
             print(f"Great job, Player {guesser}!")
+
+            # add score
+            if guesser == 1:
+                player1_score += 1
+            else:
+                player2_score += 1
+
             return True
 
     # only reaches here if guesser loses
     show_hangman(mistakes, wrong_guesses)
     print(f"\nGood try, Player {guesser}. The phrase was \"{phrase}\"\n")
+    
     return False
 
-take_turn(1)
-take_turn(2)
+    
+
+
+# Game loop that alternates between players
+scoreboard = {1: 0, 2: 0}
+
+while True:
+    if take_turn(1):  # Player 2 guesses
+        scoreboard[2] += 1
+
+    show_scoreboard(scoreboard)
+
+    if take_turn(2):  # Player 1 guesses
+        scoreboard[1] += 1
+
+    show_scoreboard(scoreboard)
